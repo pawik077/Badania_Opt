@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#define _DEBUG
 
 int main(int argc, char* argv[]) {
 	std::ifstream file;
@@ -9,18 +10,34 @@ int main(int argc, char* argv[]) {
 		file.open("input.txt");
 	}
 	// *** file read ***
-	int n;
-	file >> n;
+	// int n;
+	// file >> n;
+	// int** data = new int* [n];
+	// int* times = new int[n];
+	// for (int i = 0; i < n; i++) {
+	// 	data[i] = new int[n];
+	// 	for (int j = 0; j < n; j++) {
+	// 		file >> data[i][j];
+	// 	}
+	// }
+	// for (int i = 0; i < n; i++) {
+	// 	file >> times[i];
+	// }
+	// file.close();
+	int n, m;
+	file >> n >> m;
 	int** data = new int* [n];
-	int* times = new int[n];;
-	for (int i = 0; i < n; i++) {
-		data[i] = new int[n];
-		for (int j = 0; j < n; j++) {
-			file >> data[i][j];
-		}
-	}
+	int* times = new int[n];
 	for (int i = 0; i < n; i++) {
 		file >> times[i];
+	}
+	for (int i = 0; i < n; i++) {
+		data[i] = new int[n];
+	}
+	for (int i = 0; i < m; i++) {
+		int a, b;
+		file >> a >> b;
+		data[a - 1][b - 1] = 1;
 	}
 	file.close();
 #ifdef _DEBUG
@@ -37,6 +54,14 @@ int main(int argc, char* argv[]) {
 	}
 	std::cout << std::endl;
 #endif
+	// *** topological sorting *** 
+	// TODO: implement topological sorting
+
+
+	// *** cycle detection ***
+	// TODO: implement cycle detection
+	
+
 	int* ESs = new int[n];
 	int* EFs = new int[n];
 	int* LSs = new int[n];
@@ -46,7 +71,7 @@ int main(int argc, char* argv[]) {
 	EFs[0] = 0;
 	for (int i = 0; i < n; i++) {
 		int max = 0;
-		for (int j = 0; j < i; j++) {
+		for (int j = 0; j < n; j++) {
 			if(i == j) continue;
 			if (data[j][i] == 1) {
 				if (EFs[j] > max) {
@@ -126,6 +151,7 @@ int main(int argc, char* argv[]) {
 			", TF: " << (TFs[i] < 10 ? " " : "") << TFs[i] << "\n";
 	}
 	std::cout << std::endl;
+	std::cout << "Critical path length: " << criticalPathLength << "\n";
 	std::cout << "Critical path: ";
 	for (int i = 0; i < criticalPathLength; i++) {
 		std::cout << criticalPath[i] << " ";
