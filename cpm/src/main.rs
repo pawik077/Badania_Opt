@@ -27,40 +27,7 @@ fn main() {
 	}
 	
 	// *** cycle detection ***
-	let mut visited = vec![0; n];
-	let mut stack = vec![0; n];
-	let mut stack_size = 0;
-	let mut cycle = false;
-	for i in 0..n {
-		if visited[i] == 0 {
-			visited[i] = 1;
-			stack[stack_size] = i;
-			stack_size += 1;
-			while stack_size > 0 {
-				let node = stack[stack_size - 1];
-				let mut found = false;
-				for j in 0..n {
-					if graph[node][j] == 1 {
-						if visited[j] == 0 {
-							visited[j] = 1;
-							stack[stack_size] = j;
-							stack_size += 1;
-							found = true;
-							break;
-						} else if visited[j] == 1 {
-							cycle = true;
-							break;
-						}
-					}
-				}
-				if !found {
-					visited[node] = 2;
-					stack_size -= 1;
-				}
-			}
-		}
-	}
-	if cycle {
+	if is_cycle(&graph, n) {
 		println!("Cycle detected");
 		return;
 	}
@@ -130,4 +97,41 @@ fn main() {
 	}
 	println!("");
 	println!("Critical path length: {}", critical_path.len());
+}
+
+fn is_cycle(graph: &Vec<Vec<usize>>, n: usize) -> bool {	
+	let mut visited = vec![0; n];
+	let mut stack = vec![0; n];
+	let mut stack_size = 0;
+	let mut cycle = false;
+	for i in 0..n {
+		if visited[i] == 0 {
+			visited[i] = 1;
+			stack[stack_size] = i;
+			stack_size += 1;
+			while stack_size > 0 {
+				let node = stack[stack_size - 1];
+				let mut found = false;
+				for j in 0..n {
+					if graph[node][j] == 1 {
+						if visited[j] == 0 {
+							visited[j] = 1;
+							stack[stack_size] = j;
+							stack_size += 1;
+							found = true;
+							break;
+						} else if visited[j] == 1 {
+							cycle = true;
+							break;
+						}
+					}
+				}
+				if !found {
+					visited[node] = 2;
+					stack_size -= 1;
+				}
+			}
+		}
+	}
+	return cycle;
 }
