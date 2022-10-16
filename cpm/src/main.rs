@@ -9,7 +9,7 @@ fn main() {
 	if args.len() == 2 {
 		file = File::open(&args[1]).unwrap();
 	} else {
-		file = File::open("input.txt").unwrap();
+		file = File::open("inputs/data10.txt").unwrap();
 	}
 	let mut contents = String::new();
 	file.read_to_string(&mut contents).unwrap();
@@ -33,7 +33,14 @@ fn main() {
 	}
 	
 	// *** topological sort ***
-	// TODO
+	let mut sorted = vec![];
+	let mut visited = vec![false; n];
+	for i in 0..n {
+		if !visited[i] {
+			topological_sort(&graph, i, &mut visited, &mut sorted);
+		}
+	}
+	sorted.reverse();
 
 	let mut ESs = vec![0; n];
 	let mut EFs = vec![0; n];
@@ -41,41 +48,44 @@ fn main() {
 	let mut LFs = vec![0; n];
 
 	// *** forward operations (Early Start, Early Finish) ***
-	for i in 0..n {
-		for j in 0..n {
-			if i == j { continue; }
-			if graph[j][i] == 1 {
-				if ESs[i] < EFs[j] {
-					ESs[i] = EFs[j];
+	for i in sorted.iter(){
+		for j in sorted.iter() {
+			if *i == *j { continue; }
+			if graph[*j][*i] == 1 {
+				if ESs[*i] < EFs[*j] {
+					ESs[*i] = EFs[*j];
 				}
 			}
 		}
-		EFs[i] = ESs[i] + times[i];
+		EFs[*i] = ESs[*i] + times[*i];
 	}
 
 	// *** backward operations (Late Start, Late Finish) ***
-	LSs[n - 1] = EFs[n - 1];
-	LFs[n - 1] = EFs[n - 1];
-	for i in (0..n).rev() {
-		let mut min = EFs[n -1];
-		for j in (0..n).rev() {
-			if i == j { continue; }
-			if graph[i][j] == 1 {
-				if LSs[j] < min {
-					min = LSs[j];
+	LSs[sorted[n - 1]] = EFs[sorted[n - 1]];
+	LFs[sorted[n - 1]] = EFs[sorted[n - 1]];
+	for i in sorted.iter().rev() {
+		let mut min = *EFs.iter().max().unwrap();
+		for j in sorted.iter().rev() {
+			if *i == *j { continue; }
+			if graph[*i][*j] == 1 {
+				if LSs[*j] < min {
+					min = LSs[*j];
 				}
 			}
 		}
-		LSs[i] = min - times[i];
-		LFs[i] = min;
+		let _temp = times[*i];
+		LSs[*i] = min - times[*i];
+		LFs[*i] = min;
 	}
+
+	
 	// *** critical path ***
 	let mut TFs = vec![0; n];
 	let mut critical_path = vec![];
-	for i in 0..n {
-		TFs[i] = LSs[i] - ESs[i];
-		if TFs[i] == 0 {
-			critical_path.push(i);
+	for i in sorted.iter() {
+		TFs[*i] = LSs[*i] - ESs[*i];
+		if TFs[*i] == 0 {
+			critical_path.push(*i);
 		}
 	}
 	// *** output ***
@@ -134,4 +144,14 @@ fn is_cycle(graph: &Vec<Vec<usize>>, n: usize) -> bool {
 		}
 	}
 	return cycle;
+}
+
+fn topological_sort(graph: &Vec<Vec<usize>>, node: usize, visited: &mut Vec<bool>, sorted: &mut Vec<usize>) {
+	visited[node] = true;
+	for i in 0..graph.len() {
+		if graph[node][i] == 1 && !visited[i] {
+			topological_sort(graph, i, visited, sorted);
+		}
+	}
+	sorted.push(node);
 }
