@@ -73,7 +73,6 @@ fn main() {
 				}
 			}
 		}
-		let _temp = times[*i];
 		LSs[*i] = min - times[*i];
 		LFs[*i] = min;
 	}
