@@ -21,8 +21,8 @@ fn main() {
 	let connections = lines.next().unwrap().split_whitespace().map(|x| x.parse::<usize>().unwrap()).collect::<Vec<_>>();	
 	let mut graph = vec![vec![0; n]; n];
 	for i in 0..m {
-		let a = connections[2*i] - 1;
-		let b = connections[2*i+1] - 1;
+		let a = connections[2 * i] - 1;
+		let b = connections[2 * i + 1] - 1;
 		graph[a][b] = 1;
 	}
 	
@@ -97,13 +97,13 @@ fn main() {
 		print!("EF: {}, ", EFs[i]);
 		print!("LS: {}, ", LSs[i]);
 		print!("LF: {}, ", LFs[i]);
-		print!("TF: {}, ", TFs[i]);
+		print!("TF: {} ", TFs[i]);
 		println!("");
 	}
-	println!("");
+	println!("Process time: {}", *LFs.iter().max().unwrap());
 	print!("Critical path: ");
 	for i in 0..critical_path.len() {
-		print!("{} ", critical_path[i]+1);
+		print!("{} ", critical_path[i] + 1);
 	}
 	println!("");
 	println!("Critical path length: {}", critical_path.len());
