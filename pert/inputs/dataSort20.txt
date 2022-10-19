@@ -1,0 +1,45 @@
+20 40
+1 14 75 46 53 22 5 68 68 93 38 52 83 4 6 53 67 1 38 7
+1 6  1 14  1 17  2 6  2 14  2 19  3 15  3 17  4 5  4 6  4 8  4 12  5 6  5 7  5 20  6 9  6 19  7 11  7 15  8 11  8 20  9 14  9 15  9 17  10 11  10 16  10 18  10 20  11 17  11 19  12 17  12 18  12 19  13 16  13 17  13 18  15 16  15 20  16 19  18 20
+
+in:
+  - Pierwsza linia zawiera N liczbe zadan i M liczbe polaczen.
+  - W drugiej linii jest N czasow trwania kolejnych zadan.
+  - Trzecia linia zawiera M zaleznosci miedzy zadaniami.
+out:
+  - Calkowity czas projektu.
+  - Najwczesniejsze i najpozniejsze starty i zakonczenia.
+  - Sciezka krytyczna.
+
+process time:
+286
+earlyStart earlyFinish lateStart lateFinish:
+0 1 98 99
+0 14 85 99
+0 75 114 189
+0 46 0 46
+46 99 46 99
+99 121 99 121
+99 104 176 181
+46 114 113 181
+121 189 121 189
+0 93 88 181
+114 152 181 219
+46 98 167 219
+0 83 112 195
+189 193 282 286
+189 195 189 195
+195 248 195 248
+189 256 219 286
+98 99 278 279
+248 286 248 286
+195 202 279 286
+critical path:
+4 0 46
+5 46 99
+6 99 121
+9 121 189
+15 189 195
+16 195 248
+19 248 286
+
