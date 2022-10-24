@@ -1,4 +1,5 @@
 #![allow(non_snake_case)]
+use std::f32::consts::PI;
 use std::fs::File;
 use std::io::Read;
 
@@ -34,10 +35,10 @@ fn main() {
 		graph[a][b] = 1;
 	}
 	let mut times = vec![0; n];
-	let mut sigmas = vec![0; n];
+	let mut sigmas = vec![0.0; n];
 	for i in 0..n {
 		times[i] = (atimes[i] + 4 * mtimes[i] + btimes[i]) / 6;
-		sigmas[i] = ((btimes[i] - atimes[i]) / 6).pow(2);
+		sigmas[i] = ((btimes[i] - atimes[i]) as f64 / 6.0).powf(2.0);
 	}
 
 	// *** cycle detection ***
@@ -103,10 +104,11 @@ fn main() {
 	}
 	// *** statistics ***
 	let mu = *LFs.iter().max().unwrap();
-	let mut variance = 0;
+	let mut variance = 0.0;
 	for i in 0..critical_path.len() {
 		variance += sigmas[critical_path[i]];
 	}
+	let sigma = variance.sqrt();
 	// *** output ***
 	println!("Tasks:");
 	for i in 0..n {
@@ -125,11 +127,14 @@ fn main() {
 	}
 	println!("");
 	println!("Critical path length: {}", critical_path.len());
+	println!("");
 	println!("Statistic values: ");
-	println!("mu={}", mu);
-	println!("sigma^2={}", variance);
-	println!("sigma={}", (variance as f64).sqrt());
-	
+	println!("mu = {}", mu);
+	println!("sigma^2 = {}", variance);
+	println!("sigma = {}", sigma);
+	println!("");
+	println!("Example cdf(17): {}", cdf(17.0, mu as f64, sigma));
+	println!("Example inv_cdf(0.99): {}", inv_cdf(0.99, mu as f64, sigma));
 }
 
 fn is_cycle(graph: &Vec<Vec<usize>>, n: usize) -> bool {	
@@ -177,4 +182,38 @@ fn topological_sort(graph: &Vec<Vec<usize>>, node: usize, visited: &mut Vec<bool
 		}
 	}
 	sorted.push(node);
+}
+
+fn cdf(x: f64, mu: f64, sigma: f64) -> f64 {
+	const A: f64 = 0.2316419;
+	const A1: f64 = 0.31938153;
+	const A2: f64 = -0.356563782;
+	const A3: f64 = 1.781477937;
+	const A4: f64 = -1.821255978;
+	const A5: f64 = 1.330274429;
+	let z = (x - mu) / sigma; // standardize
+	let t = 1.0 / (1.0 + A * z.abs()); // t = 1 / (1 + a * z)
+	let d = (1.0 / (2.0 * PI as f64).sqrt()) * (-z * z / 2.0).exp(); // d = (1 / sqrt(2 * pi)) * e^(-z^2 / 2)
+	let mut prob = d * t * (A1 + t * (A2 + t * (A3 + t * (A4 + t * A5)))); // probability
+	if z > 0.0 {
+		prob = 1.0 - prob;
+	}
+	return prob;
+}
+
+fn inv_cdf(p: f64, mu: f64, sigma: f64) -> f64 {
+	let mut x = -1.0; // initial guess
+	let mut low = 0.0; // lower bound
+	let mut high = 100.0; // upper bound
+	let mut mid = 0.0; // midpoint
+	while (x - p).abs() > 0.0000001 { // while not close enough
+		mid = (low + high) / 2.0; // find midpoint
+		x = cdf(mid, mu, sigma); // find cdf at midpoint
+		if x > p { // if midpoint is too high
+			high = mid; // set upper bound to midpoint
+		} else { // if midpoint is too low
+			low = mid; // set lower bound to midpoint
+		}
+	}
+	return mid;
 }
