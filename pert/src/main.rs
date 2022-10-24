@@ -107,10 +107,6 @@ fn main() {
 	for i in 0..critical_path.len() {
 		variance += sigmas[critical_path[i]];
 	}
-	println!("mu={}", mu);
-	println!("sigma^2={}", variance);
-	println!("sigma={}", (variance as f64).sqrt());
-
 	// *** output ***
 	println!("Tasks:");
 	for i in 0..n {
@@ -123,13 +119,17 @@ fn main() {
 		print!("TF: {} ", TFs[i]);
 		println!("");
 	}
-	println!("Process time: {}", mu);
 	print!("Critical path: ");
 	for i in 0..critical_path.len() {
 		print!("{} ", critical_path[i] + 1);
 	}
 	println!("");
 	println!("Critical path length: {}", critical_path.len());
+	println!("Statistic values: ");
+	println!("mu={}", mu);
+	println!("sigma^2={}", variance);
+	println!("sigma={}", (variance as f64).sqrt());
+	
 }
 
 fn is_cycle(graph: &Vec<Vec<usize>>, n: usize) -> bool {	
