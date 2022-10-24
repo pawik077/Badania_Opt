@@ -7,10 +7,11 @@ fn main() {
 	let args: Vec<String> = std::env::args().collect();
 	// *** file read ***
 	let mut file: File;
-	if args.len() == 2 {
-		file = File::open(&args[1]).unwrap();
+	if args.len() < 2 {
+		println!("Usage: pert <input file> [<cdf/inv> <input value>]");
+		return;
 	} else {
-		file = File::open("inputs/data10.txt").unwrap();
+		file = File::open(&args[1]).unwrap();
 	}
 	let mut contents = String::new();
 	file.read_to_string(&mut contents).unwrap();
@@ -132,9 +133,20 @@ fn main() {
 	println!("mu = {}", mu);
 	println!("sigma^2 = {}", variance);
 	println!("sigma = {}", sigma);
+	if args.len() < 4 {
+		println!("Probability values not calculated (usage: pert <input file> <cdf/inv> <input value>)");
+		return;
+	}
 	println!("");
-	println!("Example cdf(17): {}", cdf(17.0, mu as f64, sigma));
-	println!("Example inv_cdf(0.99): {}", inv_cdf(0.99, mu as f64, sigma));
+	if &args[2] == "cdf" {
+		let x = args[3].parse::<f64>().unwrap();
+		println!("Probability of finishing the project in time {}: {:.2}%", x, cdf(x, mu, sigma) * 100.0);
+	} else if &args[2] == "inv" {
+		let p = args[3].parse::<f64>().unwrap() / 100.0;
+		println!("The project will finish in time {:.2} with {:.2}% probability", inv_cdf(p, mu, sigma), p * 100.0);
+	} else {
+		println!("Invalid argument: {}", args[2]);
+	}
 }
 
 fn is_cycle(graph: &Vec<Vec<usize>>, n: usize) -> bool {	
@@ -184,14 +196,14 @@ fn topological_sort(graph: &Vec<Vec<usize>>, node: usize, visited: &mut Vec<bool
 	sorted.push(node);
 }
 
-fn cdf(x: f64, mu: f64, sigma: f64) -> f64 {
+fn cdf(x: f64, mu: usize, sigma: f64) -> f64 {
 	const A: f64 = 0.2316419;
 	const A1: f64 = 0.31938153;
 	const A2: f64 = -0.356563782;
 	const A3: f64 = 1.781477937;
 	const A4: f64 = -1.821255978;
 	const A5: f64 = 1.330274429;
-	let z = (x - mu) / sigma; // standardize
+	let z = (x - mu as f64) / sigma; // standardize
 	let t = 1.0 / (1.0 + A * z.abs()); // t = 1 / (1 + a * z)
 	let d = (1.0 / (2.0 * PI as f64).sqrt()) * (-z * z / 2.0).exp(); // d = (1 / sqrt(2 * pi)) * e^(-z^2 / 2)
 	let mut prob = d * t * (A1 + t * (A2 + t * (A3 + t * (A4 + t * A5)))); // probability
@@ -201,7 +213,7 @@ fn cdf(x: f64, mu: f64, sigma: f64) -> f64 {
 	return prob;
 }
 
-fn inv_cdf(p: f64, mu: f64, sigma: f64) -> f64 {
+fn inv_cdf(p: f64, mu: usize, sigma: f64) -> f64 {
 	let mut x = -1.0; // initial guess
 	let mut low = 0.0; // lower bound
 	let mut high = 100.0; // upper bound
