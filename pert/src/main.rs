@@ -101,6 +101,16 @@ fn main() {
 			critical_path.push(*i);
 		}
 	}
+	// *** statistics ***
+	let mu = *LFs.iter().max().unwrap();
+	let mut variance = 0;
+	for i in 0..critical_path.len() {
+		variance += sigmas[critical_path[i]];
+	}
+	println!("mu={}", mu);
+	println!("sigma^2={}", variance);
+	println!("sigma={}", (variance as f64).sqrt());
+
 	// *** output ***
 	println!("Tasks:");
 	for i in 0..n {
@@ -113,7 +123,7 @@ fn main() {
 		print!("TF: {} ", TFs[i]);
 		println!("");
 	}
-	println!("Process time: {}", *LFs.iter().max().unwrap());
+	println!("Process time: {}", mu);
 	print!("Critical path: ");
 	for i in 0..critical_path.len() {
 		print!("{} ", critical_path[i] + 1);
